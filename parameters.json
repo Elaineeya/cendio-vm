@@ -1,0 +1,46 @@
+{
+    "location": {
+      "value": "swedencentral"
+    },
+    "customData": {
+      "value": "mate"
+    },
+    "vmName": {
+      "value": "linuxvm498e3"
+    },
+    "vmSize": {
+      "value": "Standard_D2s_v3"
+    },
+    "adminUsername": {
+      "value": "azureuser"
+    },
+    "authenticationType": {
+      "value": "sshPublicKey"
+    },
+    "adminPasswordOrKey": {
+      "value": "ssh-ed25519 AAAAXXXXXXX"
+    },
+    "virtualNetworkName": {
+      "value": "linuxvm498e3-vnet"
+    },
+    "addressPrefix": {
+      "value": [
+        "172.16.0.0/16"
+      ]
+    },
+    "subnetName": {
+      "value": "subnet-1"
+    },
+    "subnetAddressPrefix": {
+      "value": "172.16.0.0/24"
+    },
+    "publicIpName": {
+      "value": "linuxvm498e3-ip"
+    },
+    "publicIpDns": {
+      "value": "linuxvm498e3-407416"
+    },
+    "outTagsByResource": {
+      "value": {}
+    }
+  }
