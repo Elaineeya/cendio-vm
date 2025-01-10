@@ -24,7 +24,7 @@
                         "type": "Microsoft.Common.DropDown",
                         "label": "Which Window Manager would you like to use?",
                         "defaultValue": "MATE",
-                        "toolTip": "",
+                        "toolTip": "Please select a desktop environment for your Thinlinc users",
                         "constraints": {
                             "allowedValues": [
                                 {
@@ -70,6 +70,7 @@
                                 "constraints": {
                                     "required": false,
                                     "regex": "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$",
+                                    "regex": "^.{1,150}$",
                                     "validationMessage": "Email is not valid. Please re-enter."
                                 },
                                 "visible": true
@@ -78,6 +79,7 @@
                                 "name": "legalAccept",
                                 "type": "Microsoft.Common.CheckBox",
                                 "label": "I agree to the terms and conditions.",
+                                "toolTip": "This is to agree the legal conditions",
                                 "constraints": {
                                     "required": true,
                                     "validationMessage": "Please acknowledge the legal conditions."
@@ -162,7 +164,7 @@
                             "sshPublicKey": "SSH public key"
                         },
                         "toolTip": {
-                            "sshPublicKey": ""
+                            "sshPublicKey": "SSH Key for Linux"
                         },
                         "constraints": {
                             "required": true,
@@ -272,7 +274,8 @@
                             "Microsoft.Network/publicIPAddresses",
                             "Microsoft.Network/virtualNetworks",
                             "Microsoft.Network/networkInterfaces"
-                        ]
+                        ],
+                        "toolTip": "Tags are name/value pairs that enable you to categorize resources and view consolidated billing by applying the same tag to multiple resources and resource groups."
                     }
                 ]
             }
@@ -289,7 +292,11 @@
             "addressPrefix": "[steps('networking').virtualNetwork.addressPrefixes]",
             "subnetName": "[steps('networking').virtualNetwork.subnets.subnet1.name]",
             "subnetAddressPrefix": "[steps('networking').virtualNetwork.subnets.subnet1.addressPrefix]",
+            "virtualNetworkNewOrExisting": "[steps('networking').virtualNetwork.newOrExisting]",
+            "virtualNetworkRGName": "[steps('networking').virtualNetwork.resourceGroup]",
             "publicIpName": "[steps('networking').publicIp.dnsAndPublicIP.name]",
+            "publicIpNewOrExisting": "[steps('networking').publicIp.dnsAndPublicIP.newOrExisting]",
+            "publicIpRGName": "[steps('networking').publicIp.dnsAndPublicIP.resourceGroup]",
             "publicIpDns": "[steps('networking').publicIp.dnsAndPublicIP.domainNameLabel]",
             "outTagsByResource": "[steps('tags').tagsByResource]"
         }

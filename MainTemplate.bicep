@@ -1,5 +1,5 @@
 @description('The name of your Virtual Machine.')
-param vmName string = 'simpleLinuxVM'
+param vmName string = 'basicLinuxVM'
 
 @description('Username for the Virtual Machine.')
 param adminUsername string
@@ -39,14 +39,26 @@ param addressPrefix array = [
   '10.1.0.0/16'
 ]
 
+@description('Virtual network is new or existing.')
+param virtualNetworkNewOrExisting string = 'new'
+
+@description('Resource group of the virtual network.')
+param virtualNetworkRGName string = resourceGroup().name
+
 @description('Name of the subnet in the virtual network')
-param subnetName string = 'Subnet'
+param subnetName string = 'basic-subnet'
 
 @description('Subnet prefix of the virtual network')
 param subnetAddressPrefix string = '10.1.0.0/24'
 
 @description('Unique public IP address name')
 param publicIpName string = 'basiclinuxvm-ip'
+
+@description('Public IP new or existing or none?')
+param publicIpNewOrExisting string = 'new'
+
+@description('Resource group of the public IP address.')
+param publicIpRGName string = resourceGroup().name
 
 @description('Name of the Network Security Group')
 param networkSecurityGroupName string = '${vmName}-nsg'
@@ -62,8 +74,7 @@ param securityType string = 'Standard'
 param outTagsByResource object = {}
 
 @description('customData is passed to the VM to be saved as a file for cloud-init')
-param customData string = 'test if can store information from UI'
-
+param customData string = 'mate'
 
 var imageReference = {
   'thinlinc-ubuntu': {
@@ -110,32 +121,32 @@ var tags = {
   offer: 'Sample Basic Linux 2204 VM'
 }
 
-resource networkInterface 'Microsoft.Network/networkInterfaces@2023-09-01' = {
-  name: networkInterfaceName
+var publicIpId = {
+  new: resourceId('Microsoft.Network/publicIPAddresses', publicIpName)
+  existing: resourceId(publicIpRGName, 'Microsoft.Network/publicIPAddresses', publicIpName)
+  none: ''
+}[publicIpNewOrExisting]
+
+resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2023-06-01' = if (publicIpNewOrExisting == 'new') {
+  name: publicIpName
   location: location
-  properties: {
-    ipConfigurations: [
-      {
-        name: 'ipconfig1'
-        properties: {
-          subnet: {
-            id: virtualNetwork.properties.subnets[0].id
-          }
-          privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: {
-            id: publicIPAddress.id
-          }
-        }
-      }
-    ]
-    networkSecurityGroup: {
-      id: networkSecurityGroup.id
-    }
+  sku: {
+    name: 'Basic'
   }
-  tags: (contains(outTagsByResource, 'Microsoft.Network/networkInterfaces') ? union(tags, outTagsByResource['Microsoft.Network/networkInterfaces']) : tags)
+  properties: {
+    publicIPAllocationMethod: 'Dynamic'
+    publicIPAddressVersion: 'IPv4'
+    dnsSettings: {
+      domainNameLabel: publicIpDns
+    }
+    idleTimeoutInMinutes: 4
+  }
+  tags: (contains(outTagsByResource, 'Microsoft.Network/publicIPAddresses')
+    ? union(tags, outTagsByResource['Microsoft.Network/publicIPAddresses'])
+    : tags)
 }
 
-resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2023-09-01' = {
+resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2023-06-01' = {
   name: networkSecurityGroupName
   location: location
   properties: {
@@ -157,7 +168,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2023-09-0
   }
 }
 
-resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-09-01' = {
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-06-01' = if (virtualNetworkNewOrExisting == 'new') {
   name: virtualNetworkName
   location: location
   properties: {
@@ -177,24 +188,38 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-09-01' = {
       }
     ]
   }
+  tags: (contains(outTagsByResource, 'Microsoft.Network/virtualNetworks')
+    ? union(tags, outTagsByResource['Microsoft.Network/virtualNetworks'])
+    : tags)
 }
 
-resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
-  name: publicIpName
+resource networkInterface 'Microsoft.Network/networkInterfaces@2023-06-01' = {
+  name: networkInterfaceName
   location: location
-  sku: {
-    name: 'Basic'
-  }
   properties: {
-    publicIPAllocationMethod: 'Dynamic'
-    publicIPAddressVersion: 'IPv4'
-    dnsSettings: {
-      domainNameLabel: publicIpDns
+    ipConfigurations: [
+      {
+        name: 'ipconfig1'
+        properties: {
+          subnet: {
+            id: virtualNetwork.properties.subnets[0].id
+          }
+          privateIPAllocationMethod: 'Dynamic'
+          publicIPAddress: {
+            id: ((!empty(publicIpId)) ? publicIPAddress.id : null)
+          }
+        }
+      }
+    ]
+    networkSecurityGroup: {
+      id: networkSecurityGroup.id
     }
-    idleTimeoutInMinutes: 4
   }
-  tags: (contains(outTagsByResource, 'Microsoft.Network/publicIPAddresses') ? union(tags, outTagsByResource['Microsoft.Network/publicIPAddresses']) : tags)
+  tags: (contains(outTagsByResource, 'Microsoft.Network/networkInterfaces')
+    ? union(tags, outTagsByResource['Microsoft.Network/networkInterfaces'])
+    : tags)
 }
+
 
 resource vm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
   name: vmName
@@ -223,7 +248,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
       computerName: vmName
       adminUsername: adminUsername
       adminPassword: adminPasswordOrKey
-      customData: customData
+      customData: base64(customData)
       linuxConfiguration: ((authenticationType == 'password') ? null : linuxConfiguration)
     }
     securityProfile: (securityType == 'TrustedLaunch') ? securityProfileJson : null
@@ -233,7 +258,9 @@ resource vm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
     product: 'thinlinc'
     publisher: 'cendio'
   }
-  tags: (contains(outTagsByResource, 'Microsoft.Compute/virtualMachines') ? union(tags, outTagsByResource['Microsoft.Compute/virtualMachines']) : tags)
+  tags: (contains(outTagsByResource, 'Microsoft.Compute/virtualMachines')
+    ? union(tags, outTagsByResource['Microsoft.Compute/virtualMachines'])
+    : tags)
 }
 
 resource vmExtension 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' = if (securityType == 'TrustedLaunch' && securityProfileJson.uefiSettings.secureBootEnabled && securityProfileJson.uefiSettings.vTpmEnabled) {
@@ -260,3 +287,4 @@ resource vmExtension 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' =
 output adminUsername string = adminUsername
 output hostname string = publicIPAddress.properties.dnsSettings.fqdn
 output sshCommand string = 'ssh ${adminUsername}@${publicIPAddress.properties.dnsSettings.fqdn}'
+output unusedVirtualNetworkRGName string = virtualNetworkRGName
