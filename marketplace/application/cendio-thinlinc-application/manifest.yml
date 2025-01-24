@@ -1,0 +1,11 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+name               : "thinlinc-app"
+plan_name          : "cendio-thinlinc-application"
+app_path           : "."
+app                : "marketplacePackage.zip"
+json_listing_config: "listing_config.json"
+logo_large         : "thinlinc_logo_216_216.png"
+logo_small         : "thinlinc_logo_48_48.png"
+logo_medium        : "thinlinc_logo_90_90.png"
+logo_wide          : "thinlinc_logo_255_115.png"

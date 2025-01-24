@@ -1,0 +1,122 @@
+{
+  "offer_setup"            : {
+    "alias"    : "thinlinc-app",
+    "testDrive": false,
+    "crm"      : ""
+  },
+  "property_settings"      : {
+    "leveledCategories"  : {
+      "developer-tools-azure-apps": [
+        "other-developer-tools"
+      ]
+    }
+  },
+  "offer_listing"          : {
+    "title"              : "Cendio ThinLinc Application",
+    "publisher_name"     : "Cendio",
+    "summary"            : "<This is not complete for summary*>",
+    "short_description"  : "<This is not complete for short description*>",
+    "description"        : "<p>This is a description that is not complete.</p>",
+    "keywords"           : [
+      "remote",
+      "desktop",
+      "virtual machine"
+    ],
+    "listing_contacts"   : [
+      {
+        "type" : "CustomerSupport",
+        "email": "contact@cendio.com",
+        "name" : "Cendio Customer Support",
+        "phone": "+46 (0)13 21 46 00",
+        "uri"  : "https://community.thinlinc.com/"
+      },
+      {
+        "type" : "Engineering",
+        "email": "contact@cendio.com",
+        "name" : "Cendio",
+        "phone": "+46 (0)13 21 46 00"
+      }
+    ],
+    "listing_uris"       : [
+      {
+        "type"       : "Company",
+        "displayText": "Useful Links",
+        "uri"        : "https://www.cendio.com/"
+      }
+    ],
+    "listing_logos"      : {
+      "logo_large" : "thinlinc_logo_216_216.png",
+      "logo_small" : "thinlinc_logo_48_48.png",
+      "logo_medium": "thinlinc_logo_90_90.png",
+      "logo_wide"  : "thinlinc_logo_255_115.png"
+    },
+    "listing_screenshots": {},
+    "listing_videos"     : {}
+  },
+  "preview_audience"       : {
+    "subscriptions": [
+      "acedd2d6-e69d-4b5c-baf4-d382f464bb65"
+    ]
+  },
+  "technical_configuration": {
+    "_note"         : "Only required for emitting metering events",
+    "tenant_id"     : "fd8bb55b-cec8-4ecb-98ab-fb9761a7cae0",
+    "application_id": "ebdc5827-bfc8-42a4-990d-ad33efce7f7b"
+  },
+  "plan_overview"          : {
+    "cendio-thinlinc-application": {
+      "plan_listing"            : {
+        "title"              : "thinlinc managed application",
+        "shortDescription"  : "Short description",
+        "description"        : "<p>This is a description that uses html tags</p>"
+      },
+      "pricing_and_availability": {
+        "visibility"                 : "private",
+        "azure_private_subscriptions": [
+          {
+            "ID": "acedd2d6-e69d-4b5c-baf4-d382f464bb65"
+          }
+        ]
+      },
+      "technical_configuration" : {
+        "version"               : "0.0.1",
+        "allow_jit_access"      : false
+      }
+    },
+    "cendio-thinlinc-application-app":{
+      "plan_listing"            : {
+        "title"              : "thinlinc managed application",
+        "shortDescription"  : "Short description",
+        "description"        : "<p>This is a description that uses html tags</p>"
+      },
+      "pricing_and_availability": {
+        "visibility"                 : "private",
+        "azure_private_subscriptions": [
+          {
+            "ID": "acedd2d6-e69d-4b5c-baf4-d382f464bb65"
+          }
+        ]
+      },
+      "technical_configuration" : {
+        "version"               : "0.0.1",
+        "allowedCustomerActions": [
+          "Microsoft.Storage/*;Microsoft.KeyVault/*;Microsoft.ManagedIdentity/*;Microsoft.Network/*;Microsoft.Resources/*;Microsoft.Compute/*;Microsoft.ContainerService/*"
+        ],
+        "allowedDataActions"    : [
+          "Microsoft.Storage/*;Microsoft.KeyVault/*;Microsoft.ManagedIdentity/*;Microsoft.Network/*;Microsoft.Resources/*;Microsoft.Compute/*;Microsoft.ContainerService/*"
+        ],
+        "tenant_id"             : "fd8bb55b-cec8-4ecb-98ab-fb9761a7cae0",
+        "authorizations"        : [
+          {
+            "id"  : "ebdc5827-bfc8-42a4-990d-ad33efce7f7b",
+            "role": "Owner"
+          }
+        ],
+        "policy_settings"       : [],
+        "allow_jit_access"      : false
+      }
+    }
+  },
+  "co-sell"                : {},
+  "resell"                 : {}
+}
