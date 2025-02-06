@@ -54,12 +54,44 @@ try
 
     # Create offer
     Write-Output "Creating offer $offerName..."
-    azpc $offerType create --update --name $offerName --config-json $listingConfigFile --app-path "."
+    $timeoutSeconds = 300  # 5 minutes
+    $job = Start-Job -ScriptBlock {
+        param($offerType, $offerName, $listingConfigFile)
+        azpc $offerType create --config-yml ./config.yml --update --name $offerName --config-json $listingConfigFile --app-path "."
+    } -ArgumentList $offerType, $offerName, $listingConfigFile
+
+    Wait-Job $job -Timeout $timeoutSeconds
+    if ($job.State -eq "Running") {
+        Stop-Job $job
+        Write-Error "azpc command timed out after $timeoutSeconds seconds."
+        #Exit 1
+    } else {
+        $result = Receive-Job $job
+        Write-Output $result
+    }
+    Remove-Job $job
+
+    #azpc $offerType create --update --name $offerName --config-json $listingConfigFile --app-path "."
     Write-Output "Offer $offerName created or updated."
 
     # Create plan
     Write-Output "Creating plan $planName for offer $offerName..."
-    azpc $offerType plan create --update --name $offerName --plan-name $planName --config-json $listingConfigFile --app-path "."
+    $job = Start-Job -ScriptBlock {
+        param($offerType, $offerName, $planName, $listingConfigFile)
+        azpc $offerType plan create --config-yml ./config.yml --update --name $offerName --plan-name $planName --config-json $listingConfigFile --app-path "."
+    } -ArgumentList $offerType, $offerName, $planName, $listingConfigFile
+
+    Wait-Job $job -Timeout $timeoutSeconds
+    if ($job.State -eq "Running") {
+        Stop-Job $job
+        Write-Error "azpc command timed out after $timeoutSeconds seconds."
+        #Exit 1
+    } else {
+        $result = Receive-Job $job
+        Write-Output $result
+    }
+    Remove-Job $job
+    #azpc $offerType plan create --update --name $offerName --plan-name $planName --config-json $listingConfigFile --app-path "."
     Write-Output "Plan $planName for offer $offerName created or updated."
 
     # Clean up
