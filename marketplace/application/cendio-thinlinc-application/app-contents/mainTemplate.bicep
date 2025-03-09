@@ -73,8 +73,12 @@ param securityType string = 'Standard'
 @description('Tags by resource')
 param outTagsByResource object = {}
 
-@description('customData is passed to the VM to be saved as a file for cloud-init')
-param customData string = 'mate'
+@description('Enable or disable the web interface.')
+param webInterfaceEnabled string
+
+@description('Select the desktop environment for ThinLinc users.')
+param desktopEnv string
+
 
 var imageReference = {
   'thinlinc-ubuntu': {
@@ -126,6 +130,33 @@ var publicIpId = {
   existing: resourceId(publicIpRGName, 'Microsoft.Network/publicIPAddresses', publicIpName)
   none: ''
 }[publicIpNewOrExisting]
+
+var cloudInitScript = format('''
+#cloud-config
+
+# Configure web interface
+runcmd:
+  - |
+    if [ "{0}" = "disabled" ]; then
+      systemctl disable --now tlwebaccess
+    fi
+
+# Install and configure the selected desktop environment
+packages:
+  - {1}
+''', webInterfaceEnabled, desktopEnv)
+
+// Replace placeholders with actual parameter values
+// var cloudInitScript = replace(
+//   replace(
+//     cloudInitScriptTemplate,
+//     '${webInterfaceEnabled}',
+//     webInterfaceEnabled
+//   ),
+//   '${desktopEnv}',
+//   desktopEnv
+// )
+
 
 resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2023-06-01' = if (publicIpNewOrExisting == 'new') {
   name: publicIpName
@@ -248,7 +279,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
       computerName: vmName
       adminUsername: adminUsername
       adminPassword: adminPasswordOrKey
-      customData: base64(customData)
+      customData: base64(cloudInitScript)
       linuxConfiguration: ((authenticationType == 'password') ? null : linuxConfiguration)
     }
     securityProfile: (securityType == 'TrustedLaunch') ? securityProfileJson : null

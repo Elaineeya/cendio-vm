@@ -4,182 +4,86 @@
     "version": "0.1.2-preview",
     "parameters": {
         "basics": [
+            {
+                "name": "vmName",
+                "type": "Microsoft.Common.TextBox",
+                "label": "Virtual Machine name",
+                "toolTip": "The name of the Virtual Machine.",
+                "defaultValue": "linux-vm",
+                "constraints": {
+                    "required": true,
+                    "regex": "^[a-z0-9A-Z-]{3,79}$",
+                    "validationMessage": "The VM Name must be between 3 and 79 characters long and contain letters, numbers and hyphens only."
+                }
+            },
+            {
+                "name": "vmSize",
+                "type": "Microsoft.Compute.SizeSelector",
+                "label": "Virtual machine size",
+                "toolTip": "Select a VM size to support the workload that you want to run. The size that you choose then determines factors such as processing power, memory, and storage capacity. Azure offers a wide variety of sizes to support many types of uses. Azure charges an hourly price based on the VM's size and operating system.<br>[Learn more about Virtual Machine sizes](http://go.microsoft.com/fwlink/?LinkId=2079859)",
+                "defaultValue": "Standard_D2s_v3",
+                "recommendedSizes": [
+                  "Standard_D2s_v3",
+                  "Standard_D4s_v3"
+                ],
+                "constraints": {
+                  "required": true
+                },
+                "osPlatform": "Linux",
+                "imageReference": {
+                  "publisher": "Canonical",
+                  "offer": "0001-com-ubuntu-server-jammy",
+                  "sku": "22_04-lts-gen2"
+                },
+                "visible": true
+            },
+            {
+              "name": "administratorAccount",
+              "type": "Microsoft.Common.Section",
+              "label": "Administrator account",
+              "elements": [
+                {
+                  "name": "adminUsername",
+                  "type": "Microsoft.Compute.UserNameTextBox",
+                  "label": " Username",
+                  "defaultValue": "",
+                  "toolTip": "The administrator username for the VM",
+                  "constraints": {
+                      "required": true,
+                      "regex": "^[a-z0-9A-Z]{1,30}$",
+                      "validationMessage": "Only alphanumeric characters are allowed, and the value must be 1-30 characters long."
+                  },
+                  "osPlatform": "Linux",
+                  "visible": true
+                },
+                {
+                  "name": "adminPassword",
+                  "type": "Microsoft.Compute.CredentialsCombo",
+                  "label": {
+                      "authenticationType": "Authentication type",
+                      "password": "Password",
+                      "confirmPassword": "Confirm password",
+                      "sshPublicKey": "SSH public key"
+                  },
+                  "toolTip": {
+                      "sshPublicKey": "SSH Key for Linux"
+                  },
+                  "constraints": {
+                      "required": true,
+                      "customPasswordRegex": "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])[\\w~@#$%^&*+=|{}:;!.?\\()\\[\\]-]{8,}$",
+                      "customValidationMessage": "The password must contain at least 8 characters, with at least 1 uppercase, 1 lowercase and 1 number."
+                  },
+                  "options": {
+                      "hideConfirmation": false,
+                      "hidenPassword": false
+                  },
+                  "osPlatform": "Linux",
+                  "visible": true
+                }
+              ]
+            }
         ],
         "steps": [
-            {
-                "name": "thinlincOptions",
-                "label": "Thinlinc Options",
-                "elements": [
-                    {
-                        "name": "infoMessage",
-                        "type": "Microsoft.Common.InfoBox",
-                        "visible": true,
-                        "options": {
-                            "icon": "Info",
-                            "text": "Welcome to the ThinLinc Remote Desktop Server"
-                        }
-                    },
-                    {
-                        "name": "windowManagerType",
-                        "type": "Microsoft.Common.DropDown",
-                        "label": "Which Window Manager would you like to use?",
-                        "defaultValue": "MATE",
-                        "toolTip": "Please select a desktop environment for your Thinlinc users",
-                        "constraints": {
-                            "allowedValues": [
-                                {
-                                    "label": "MATE",
-                                    "value": "mate"
-                                },
-                                {
-                                    "label": "KDE",
-                                    "value": "kde"
-                                },
-                                {
-                                    "label": "GNOME",
-                                    "value": "gnome"
-                                }
-                            ],
-                            "required": true
-                        },
-                        "visible": true
-                    },
-                    {
-                        "name": "newsletter",
-                        "type": "Microsoft.Common.Section",
-                        "label": "Monthly Newsletter",
-                        "elements": [
-                            {
-                                "name": "announcement",
-                                "type": "Microsoft.Common.TextBlock",
-                                "visible": true,
-                                "options": {
-                                    "text": "Join our ThinLinc Community Forum and meet people from a wide range of industries and disciplines! No spam (no kidding). Must be at least 18 years old to register.",
-                                    "link": {
-                                        "label": "Learn more",
-                                        "uri": "https://www.cendio.com/"
-                                    }
-                                }
-                            },
-                            {
-                                "name": "emailAddress",
-                                "type": "Microsoft.Common.TextBox",
-                                "label": "Email",
-                                "defaultValue": "",
-                                "toolTip": "Please enter a valid email account",
-                                "constraints": {
-                                    "required": false,
-                                    "regex": "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$",
-                                    "regex": "^.{1,150}$",
-                                    "validationMessage": "Email is not valid. Please re-enter."
-                                },
-                                "visible": true
-                            },
-                            {
-                                "name": "legalAccept",
-                                "type": "Microsoft.Common.CheckBox",
-                                "label": "I agree to the terms and conditions.",
-                                "toolTip": "This is to agree the legal conditions",
-                                "constraints": {
-                                    "required": true,
-                                    "validationMessage": "Please acknowledge the legal conditions."
-                                }
-                            }
-                        ],
-                        "visible": true
-                    }
-                ]
-            },
-            {
-                "name": "vmSettings",
-                "label": "Virtual Machine Settings",
-                "elements": [
-                    {
-                        "name": "vmName",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Virtual machine name",
-                        "toolTip": "Virtual machines in Azure have two distinct names: virtual machine name used as the Azure resource identifier, and in guest host name. When you create a VM in the portal, the same name is used for both the virtual machine name and the host name. The virtual machine name cannot be changed after the VM is created. You can change the host name when you log into the virtual machine.",
-                        "defaultValue": "[concat('linuxvm', take(replace(guid(), '-', ''), 5))]",
-                        "constraints": {
-                          "required": true,
-                          "validations": [
-                            {
-                              "regex": "^([a-zA-Z0-9-]{0,14}[a-zA-Z0-9]){1}$",
-                              "message": "The virtual machine name can only contain alphanumeric values and hyphens, but may not end with a hyphen. The name must be between 1-15 characters."
-                            }
-                          ]
-                        },
-                        "visible": true
-                    },
-                    {
-                        "name": "vmSize",
-                        "type": "Microsoft.Compute.SizeSelector",
-                        "label": "Virtual machine size",
-                        "toolTip": "Select a VM size to support the workload that you want to run. The size that you choose then determines factors such as processing power, memory, and storage capacity. Azure offers a wide variety of sizes to support many types of uses. Azure charges an hourly price based on the VM's size and operating system.<br>[Learn more about Virtual Machine sizes](http://go.microsoft.com/fwlink/?LinkId=2079859)",
-                        "recommendedSizes": [
-                          "Standard_D2s_v3",
-                          "Standard_D4s_v3"
-                        ],
-                        "constraints": {
-                          "allowedSizes": [
-                            "Standard_DS2_v2",
-                            "Standard_DS3_v2",
-                            "Standard_DS4_v2",
-                            "Standard_DS5_v2",
-                            "Standard_D2s_v3",
-                            "Standard_D4s_v3",
-                            "Standard_D8s_v3",
-                            "Standard_D16s_v3"
-                          ]
-                        },
-                        "osPlatform": "Linux",
-                        "imageReference": {
-                          "publisher": "Canonical",
-                          "offer": "0001-com-ubuntu-server-jammy",
-                          "sku": "22_04-lts-gen2"
-                        },
-                        "visible": true
-                    },
-                    {
-                        "name": "adminUsername",
-                        "type": "Microsoft.Compute.UserNameTextBox",
-                        "label": "Admin Username",
-                        "defaultValue": "",
-                        "toolTip": "The administrator username for the VM",
-                        "constraints": {
-                            "required": true,
-                            "regex": "^[a-z0-9A-Z]{1,30}$",
-                            "validationMessage": "Only alphanumeric characters are allowed, and the value must be 1-30 characters long."
-                        },
-                        "osPlatform": "Linux",
-                        "visible": true
-                    },
-                    {
-                        "name": "adminPassword",
-                        "type": "Microsoft.Compute.CredentialsCombo",
-                        "label": {
-                            "authenticationType": "Authentication type",
-                            "password": "Password",
-                            "confirmPassword": "Confirm password",
-                            "sshPublicKey": "SSH public key"
-                        },
-                        "toolTip": {
-                            "sshPublicKey": "SSH Key for Linux"
-                        },
-                        "constraints": {
-                            "required": true,
-                            "customPasswordRegex": "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])[\\w~@#$%^&*+=|{}:;!.?\\()\\[\\]-]{8,}$",
-                            "customValidationMessage": "The password must contain at least 8 characters, with at least 1 uppercase, 1 lowercase and 1 number."
-                        },
-                        "options": {
-                            "hideConfirmation": false,
-                            "hidenPassword": false
-                        },
-                        "osPlatform": "Linux",
-                        "visible": true
-                    }
-                ]
-            },
             {
                 "name": "networking",
                 "label": "Networking",
@@ -197,46 +101,47 @@
                         }
                     },
                     {
-                        "name": "virtualNetwork",
-                        "type": "Microsoft.Network.VirtualNetworkCombo",
-                        "label": {
-                          "virtualNetwork": "Virtual network",
-                          "subnets": "Subnets"
-                        },
-                        "toolTip": {
-                          "virtualNetwork": "Virtual networks are logically isolated from each other in Azure. You can configure their IP address ranges, subnets, route tables, gateways, and security settings, much like a traditional network in your data center. Virtual machines in the same virtual network can access each other by default.",
-                          "subnets": "A subnet is a range of IP addresses in your virtual network, which can be used to isolate virtual machines from each other or from the Internet."
-                        },
-                        "defaultValue": {
-                          "name": "[concat(steps('vmSettings').vmName, '-vnet')]",
-                          "addressPrefixSize": "/16"
-                        },
-                        "options": {
-                          "hideExisting": false
-                        },
-                        "constraints": {
-                          "minAddressPrefixSize": "/16"
-                        },
-                        "subnets": {
-                          "subnet1": {
-                            "label": "Subnet",
+                        "name": "networkInterface",
+                        "type": "Microsoft.Common.Section",
+                        "label": "Network Interface",
+                        "elements": [
+                          {
+                            "name": "virtualNetwork",
+                            "type": "Microsoft.Network.VirtualNetworkCombo",
+                            "label": {
+                              "virtualNetwork": "Virtual network",
+                              "subnets": "Subnets"
+                            },
+                            "toolTip": {
+                              "virtualNetwork": "Virtual networks are logically isolated from each other in Azure. You can configure their IP address ranges, subnets, route tables, gateways, and security settings, much like a traditional network in your data center. Virtual machines in the same virtual network can access each other by default.",
+                              "subnets": "A subnet is a range of IP addresses in your virtual network, which can be used to isolate virtual machines from each other or from the Internet."
+                            },
                             "defaultValue": {
-                              "name": "subnet-1",
-                              "addressPrefixSize": "/24"
+                              "name": "[concat(steps('vmSettings').vmName, '-vnet')]",
+                              "addressPrefixSize": "/16"
+                            },
+                            "options": {
+                              "hideExisting": false
                             },
                             "constraints": {
-                              "minAddressPrefixSize": "/24",
-                              "minAddressCount": 12,
-                              "requireContiguousAddresses": false
+                              "minAddressPrefixSize": "/16",
+                              "required": true
+                            },
+                            "subnets": {
+                              "subnet1": {
+                                "label": "Subnet",
+                                "defaultValue": {
+                                  "name": "subnet-1",
+                                  "addressPrefixSize": "/24"
+                                },
+                                "constraints": {
+                                  "minAddressPrefixSize": "/24",
+                                  "minAddressCount": 12,
+                                  "requireContiguousAddresses": false
+                                }
+                              }
                             }
-                          }
-                        }
-                    },
-                    {
-                        "name": "publicIp",
-                        "type": "Microsoft.Common.Section",
-                        "label": "Configure public IP and DNS",
-                        "elements": [
+                          },
                           {
                             "name": "dnsAndPublicIP",
                             "type": "Microsoft.Network.PublicIpAddressCombo",
@@ -263,6 +168,82 @@
                 ]
             },
             {
+              "name": "thinlincOptions",
+              "label": "Thinlinc Options",
+              "elements": [
+                  {
+                      "name": "infoMessage",
+                      "type": "Microsoft.Common.InfoBox",
+                      "visible": true,
+                      "options": {
+                          "icon": "Info",
+                          "text": "Welcome to the ThinLinc Remote Desktop Server"
+                      }
+                  },
+                  {
+                      "name": "desktopEnv",
+                      "type": "Microsoft.Common.DropDown",
+                      "label": "Desktop Environment",
+                      "defaultValue": "Mate",
+                      "toolTip": "Please select a desktop environment for your Thinlinc users",
+                      "constraints": {
+                          "allowedValues": [
+                              {
+                                  "label": "None",
+                                  "value": "none"
+                              },
+                              {
+                                  "label": "Mate",
+                                  "value": "mate"
+                              },
+                              {
+                                  "label": "Gnome Classic",
+                                  "value": "gnome_calssic"
+                              },
+                              {
+                                  "label": "Gnome",
+                                  "value": "gnome"
+                              },
+                              {
+                                  "label": "XFCE",
+                                  "value": "xfce"
+                              }
+                          ],
+                          "required": true
+                      },
+                      "visible": true
+                  },
+                  {
+                      "name": "webInterfaceEnabled",
+                      "type": "Microsoft.Common.OptionsGroup",
+                      "label": "Enable/Disable Web Interface",
+                      "defaultValue": "enabled",
+                      "toolTip": "Choose whether to enable or disable the web interface.",
+                      "constraints": {
+                        "allowedValues": [
+                          {
+                            "label": "Enable",
+                            "value": "enabled"
+                          },
+                          {
+                            "label": "Disable",
+                            "value": "disabled"
+                          }
+                        ],
+                        "required": true
+                      }
+                  },
+                  {
+                      "name": "webInterfaceInfo",
+                      "type": "Microsoft.Common.TextBlock",
+                      "visible": true,
+                      "options": {
+                        "text": "By default, ThinLinc’s Web Access service (tlwebaccess) is available on TCP port 300. Traffic to this port is encrypted (TLS)."
+                    }
+                  }
+              ]
+            },
+            {
                 "name": "tags",
                 "label": "Tags",
                 "elements": [
@@ -282,22 +263,23 @@
         ],
         "outputs": {
             "location": "[location()]",
-            "customData": "[steps('thinlincOptions').windowManagerType]",
-            "vmName": "[steps('vmSettings').vmName]",
-            "vmSize": "[steps('vmSettings').vmSize]",
-            "adminUsername": "[steps('vmSettings').adminUsername]",
-            "authenticationType": "[steps('vmSettings').adminPassword.authenticationType]",
-            "adminPasswordOrKey": "[steps('vmSettings').adminPassword.sshPublicKey]",
-            "virtualNetworkName": "[steps('networking').virtualNetwork.name]",
-            "addressPrefix": "[steps('networking').virtualNetwork.addressPrefixes]",
-            "subnetName": "[steps('networking').virtualNetwork.subnets.subnet1.name]",
-            "subnetAddressPrefix": "[steps('networking').virtualNetwork.subnets.subnet1.addressPrefix]",
-            "virtualNetworkNewOrExisting": "[steps('networking').virtualNetwork.newOrExisting]",
-            "virtualNetworkRGName": "[steps('networking').virtualNetwork.resourceGroup]",
-            "publicIpName": "[steps('networking').publicIp.dnsAndPublicIP.name]",
-            "publicIpNewOrExisting": "[steps('networking').publicIp.dnsAndPublicIP.newOrExisting]",
-            "publicIpRGName": "[steps('networking').publicIp.dnsAndPublicIP.resourceGroup]",
-            "publicIpDns": "[steps('networking').publicIp.dnsAndPublicIP.domainNameLabel]",
+            "vmName": "[basics('vmName')]",
+            "vmSize": "[basics('vmSize')]",
+            "adminUsername": "[basics('administratorAccount').adminUsername]",
+            "authenticationType": "[basics('administratorAccount').adminPassword.authenticationType]",
+            "adminPasswordOrKey": "[basics('administratorAccount').adminPassword.sshPublicKey]",
+            "virtualNetworkName": "[steps('networking').networkInterface.virtualNetwork.name]",
+            "addressPrefix": "[steps('networking').networkInterface.virtualNetwork.addressPrefixes]",
+            "subnetName": "[steps('networking').networkInterface.virtualNetwork.subnets.subnet1.name]",
+            "subnetAddressPrefix": "[steps('networking').networkInterface.virtualNetwork.subnets.subnet1.addressPrefix]",
+            "virtualNetworkNewOrExisting": "[steps('networking').networkInterface.virtualNetwork.newOrExisting]",
+            "virtualNetworkRGName": "[steps('networking').networkInterface.virtualNetwork.resourceGroup]",
+            "publicIpName": "[steps('networking').networkInterface.dnsAndPublicIP.name]",
+            "publicIpNewOrExisting": "[steps('networking').networkInterface.dnsAndPublicIP.newOrExisting]",
+            "publicIpRGName": "[steps('networking').networkInterface.dnsAndPublicIP.resourceGroup]",
+            "publicIpDns": "[steps('networking').networkInterface.dnsAndPublicIP.domainNameLabel]",
+            "desktopEnv": "[steps('thinlincOptions').desktopEnv]",
+            "webInterfaceEnabled": "[steps('thinlincOptions').webInterfaceEnabled]",
             "outTagsByResource": "[steps('tags').tagsByResource]"
         }
     }
