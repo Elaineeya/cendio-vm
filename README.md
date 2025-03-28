@@ -38,7 +38,7 @@ Please refer to the [Microsoft documentation](https://docs.microsoft.com/en-us/a
 
 ## Step 4: Validate Template synatx 
 
-Azure provides a set of template toolkits for validating the synatx, please refer to [arm-ttk] (https://github.com/Azure/arm-ttk/tree/master) for more information. To simplify the validation steps, please follow below steps:
+Azure provides a set of template toolkits for validating the synatx, please refer to [arm-ttk](https://github.com/Azure/arm-ttk/tree/master) for more information. To simplify the validation steps, please follow below steps:
 
 1. git clone https://github.com/Azure/arm-ttk/tree/master
 
