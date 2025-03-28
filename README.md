@@ -36,7 +36,22 @@ The Azure Application offer type requires an Azure Resource Manager (ARM) templa
 
 Please refer to the [Microsoft documentation](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/overview?tabs=bicep) for more information on how to write Bicep templates.
 
-## Step 4: Test the ARM template
+## Step 4: Validate Template synatx 
+
+Azure provides a set of template toolkits for validating the synatx, please refer to [arm-ttk] (https://github.com/Azure/arm-ttk/tree/master) for more information. To simplify the validation steps, please follow below steps:
+
+1. git clone https://github.com/Azure/arm-ttk/tree/master
+
+2. generate mainTemplate.json file:
+```
+az bicep build --file MainTemplate.bicep
+```
+3. run `Test-AzTemplate.sh` script, please use `-TemplatePath` to specify the folder of all templates. 
+```
+./Test-AzTemplate.sh  -TemplatePath ../marketplace/application/cendio-thinlinc-application/app-contents/
+```
+
+## Step 5: Test the ARM template
 
 In the [scripts] folder of this repository, you will find the PowerShell scripts you can use to deploy the offer.
 
@@ -56,15 +71,15 @@ az storage account create -n mystorageacct -g MyResourceGroup -l westus --sku St
 
 4. Cleanup the deployment. Replace "MyResourceGroup" with your own resource group name.
 ```
-az group create --name MyResourceGroup
+az group delete --name MyResourceGroup
 ```
 
-## Step 5: Prepare the offer
+## Step 6: Prepare the offer
 
 Update the [listing configuration file](marketplace/application/cendio-thinlinc-application/listing_config.json) (`listing.json`) with the information about your offer.
 
 
-## Step 6: Prepare a Microsoft Entra application accessing to your Partner Center
+## Step 7: Prepare a Microsoft Entra application accessing to your Partner Center
 
 1. Please refer to the [Microsoft documentation](https://learn.microsoft.com/en-us/partner-center/marketplace-offers/submission-api-onboard) to create a Micorsoft Entra application.
 
@@ -79,7 +94,7 @@ aad_secret                  : "<Service Principal Secret>"
 access_id                   : "<Service Principal ID>"
 ```
 
-## Step 7: Create the Offer
+## Step 8: Create the Offer
 
 A [script](scripts/addUpdate_azureApplicationOffer.ps1) is provided in the `scripts` folder of this repository to create the Azure Application (Solution Template or Managed Application) offer.
 
@@ -96,7 +111,7 @@ The script will package the solution, create an offer if it does not already exi
 ```
 Where "\<offer type>" has the option of st or ma, for solution template and managed application, respectively.
 
-## Step 8: Publishing the Azure Application Offer
+## Step 9: Publishing the Azure Application Offer
 Once the draft offer created in the above step has been reviewed and confirmed, the offer can be submitted for publishing.
 
 To start the publishing process:
